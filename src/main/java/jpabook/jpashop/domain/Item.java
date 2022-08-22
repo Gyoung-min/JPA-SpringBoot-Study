@@ -1,7 +1,7 @@
 package jpabook.jpashop.domain;
 
+import jpabook.jpashop.service.exception.NotEnoughStockException;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="dtype")
 @Getter
-@Setter
 public abstract class Item {
 
     @Id
@@ -25,4 +24,19 @@ public abstract class Item {
 
     @ManyToMany(mappedBy = "items")
     private List<Category> categories = new ArrayList<>();
+
+    //비즈니스 로직
+    public void addStack(int quantity) {
+        this.stackQuantity += quantity;
+    }
+
+    public void removeStack(int quantity) {
+       int restStack = this.stackQuantity - quantity;
+       if(restStack < 0) {
+           throw new NotEnoughStockException("need more stock");
+       }
+       this.stackQuantity = restStack;
+    }
+
+
 }
