@@ -1,6 +1,9 @@
 package jpabook.jpashop.domain;
 
+import jpabook.jpashop.domain.item.Item;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -8,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
 
     @Id
@@ -26,4 +30,33 @@ public class OrderItem {
     private int orderPrice;
     private int count;
 
+/*
+    protected OrderItem() {
+
+    } 아 롬복의 힘을 맛보아라!
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+*/
+
+    //생성 메서드
+    public static OrderItem createOrderItem(Item item, int orderPrice, int count) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        orderItem.setOrderPrice(orderPrice);
+        orderItem.setCount(count);
+
+        item.removeStack(count);
+        return orderItem;
+    }
+
+    //비즈니스 로직
+    public void cancel() {
+        getItem().addStack(count);
+        //주문 취소 시 재고 상승
+
+    }
+
+    //조회 로직
+    public int getTotalPrice() {
+        return getOrderPrice() * getCount();
+    }
 }
